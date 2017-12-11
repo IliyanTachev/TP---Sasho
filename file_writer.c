@@ -2,8 +2,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include<string.h>
-
+#include <string.h>
+#include <stdio.h>
 int main()
 {
     int fd;
@@ -14,13 +14,35 @@ int main()
     
     fd = open(myfifo, O_WRONLY);
     
-    for(int i=0;i<10;++i)
+    if(fd < 0)
+    {	
+	perror("open");
+	return 1;
+    }
+
+    char* str = "Simply The.BesT. xX.";
+    int length = strlen(str);
+
+    for(int i=0;i<length;++i)
     {
-        write(fd, "Simply The.BesT. xX." , sizeof("Simply The.BesT. xX.")+1);
+        int written = write(fd,str,1);
+	if(written < 0)
+	{
+		perror("write");
+		return 2; 
+	}
+
+	str++;
     }
 
         
-    close(fd);
+    int closed = close(fd);
+    
+    if(closed < 0)
+    {
+	perror("close");
+	return 3;
+    }
 
     unlink(myfifo);
 
